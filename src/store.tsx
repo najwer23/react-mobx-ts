@@ -1,49 +1,77 @@
 import { makeAutoObservable } from "mobx";
 
 // Standard interface and functions
-interface Todo {
+interface Tran {
   id: number;
-  text: string;
-  done: boolean;
+  tran: string;
+  tranValuePLN: number;
+  tranValueEUR: number;
 }
 
-const removeTodo = (todos: Todo[], id: number): Todo[] =>
-  todos.filter((todo) => todo.id !== id);
+const removeTran = (transactions: Tran[], id: number): Tran[] => {
+  return transactions.filter((tran) => tran.id !== id);
+}
 
-const addTodo = (todos: Todo[], text: string): Todo[] => [
-  ...todos,
+const addNewTran = (transactions: Tran[], tran: string, tranValuePLN: number, tranValueEUR: number): Tran[] => [
+  ...transactions,
   {
-    id: Math.max(0, Math.max(...todos.map(({ id }) => id))) + 1,
-    text,
-    done: false,
+    id: Math.max(0, Math.max(...transactions.map(({ id }) => id))) + 1,
+    tran,
+    tranValuePLN,
+    tranValueEUR
   },
 ];
 
 // MobX implementation
-class Todos {
-  todos: Todo[] = [];
-  newTodo: string = "999";
+class Transactions {
+  transactions: Tran[] = [];
+  tranName: string = "";
+  euro: number = 0;
+  tranValuePLN: number = 0;
+  tranValueEUR: number = 0;
+	sumPLN: number = 0;
+	sumEUR: number = 0;
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  removeTodo(id: number) {
-    this.todos = removeTodo(this.todos, id);
+  removeTran(id: number) {
+    this.transactions = removeTran(this.transactions, id);
+		this.calculateSum();
   }
 
-  addTodo() {
-    this.todos = addTodo(this.todos, this.newTodo);
-    this.newTodo = "";
+  addNewTran() {
+    this.tranValueEUR = Number((this.tranValuePLN / this.euro).toFixed(2));
+    this.transactions = addNewTran(this.transactions, this.tranName, this.tranValuePLN, this.tranValueEUR);
+    this.tranName = "";
+    this.tranValuePLN = 0;
+    this.tranValueEUR = 0;
+
+		this.calculateSum();
   }
 
-  load(url: string) {
-    fetch(url)
-      .then((resp) => resp.json())
-      .then((tds: Todo[]) => (store.todos = tds));
+	calculateSum() {
+		this.sumPLN = this.sum(this.transactions.map(value => value.tranValuePLN))
+		this.sumEUR = this.sum(this.transactions.map(value => value.tranValueEUR))
+	}
+
+	sum (arr: Array<number>) {
+		return arr.reduce((a,b) => a + b, 0);
+	}
+
+  async loadCurrency() {
+		try {
+			let response = await fetch("https://api.nbp.pl/api/exchangerates/rates/a/eur/?format=json");
+			let json = await response.json();
+			this.euro = json.rates[0].mid;
+		} catch(e) {
+			this.euro = 4.382;
+		}
+
   }
 }
 
-const store = new Todos();
+const store = new Transactions();
 
 export default store;

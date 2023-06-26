@@ -23,13 +23,16 @@ export const Input = ({id, label, innerRef, type, onBlur}: InputProps): JSX.Elem
 			<div className="input-with-label">
 				<label htmlFor={id}> {label}</label>
 
-				<input
-					onBlur={handleBlur}
-					ref={innerRef}
-					type={type}
-					name={id}
-					id={id}
-				/>
+				<div>
+					<input
+						onBlur={handleBlur}
+						ref={innerRef}
+						type={type}
+						name={id}
+						id={id}
+					/>
+				</div>
+
 			</div>
 		</>
 	);
