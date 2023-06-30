@@ -8,8 +8,8 @@ import { Validation } from "../validation/Validation";
 import { useEffect } from 'react'
 
 function List(): JSX.Element {
-	const input = useRef<HTMLInputElement>(null)
-	const input2 = useRef<HTMLInputElement>(null)
+	const inputTitleTran = useRef<HTMLInputElement>(null)
+	const inputAmount = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
 		store.loadCurrency();
@@ -24,20 +24,20 @@ function List(): JSX.Element {
 		].filter((v) => !v);
 
 		if (valid.length === 0) {
-			store.tranName = input.current!.value;
-			store.tranValuePLN = Number(input2.current!.value);
+			store.tranName = inputTitleTran.current!.value;
+			store.amount = Number(inputAmount.current!.value);
 			store.addNewTran();
-			input.current!.value = store.tranName
-			input2.current!.value = store.tranValuePLN === 0 ? "" : String(store.tranValuePLN);
+			inputTitleTran.current!.value = store.tranName
+			inputAmount.current!.value = store.amount === 0 ? "" : String(store.amount);
 		}
 	}
 
 	function validInput() {
-		return Validation("titleOfTransaction", input.current!.parentNode, input.current!.value);
+		return Validation("titleOfTransaction", inputTitleTran.current!.parentNode, inputTitleTran.current!.value);
 	}
 
 	function validInput2() {
-		return Validation("max2Decimals", input2.current!.parentNode, input2.current!.value);
+		return Validation("max2Decimals", inputAmount.current!.parentNode, inputAmount.current!.value);
 	}
 
 	return (
@@ -50,7 +50,7 @@ function List(): JSX.Element {
 
 			<form onSubmit={handleSubmit}>
 				<Input
-					innerRef={input}
+					innerRef={inputTitleTran}
 					id={"titleOfTransaction"}
 					label={"Title of transaction"}
 					type="text"
@@ -60,7 +60,7 @@ function List(): JSX.Element {
 
 				<div style={{display: "flex", justifyContent: "space-between"}}>
 					<Input
-						innerRef={input2}
+						innerRef={inputAmount}
 						id={"amount"}
 						label={"Amount (in PLN)"}
 						type="text"
@@ -96,8 +96,8 @@ function List(): JSX.Element {
 					return (
 						<tr key={item.id}>
 							<td>{item.tran}</td>
-							<td>{item.tranValuePLN.toFixed(2)}</td>
-							<td>{item.tranValueEUR.toFixed(2)}</td>
+							<td>{item.amount.toFixed(2)}</td>
+							<td>{store.convertToEuro(Number(item.amount.toFixed(2)))}</td>
 							<td>
 								<Button
 									onClick={() => { store.removeTran(item.id) }}
@@ -118,7 +118,7 @@ function List(): JSX.Element {
 			</div>
 
 			<div>
-				<span>Sum: {store.sumPLN.toFixed(2)} PLN ({store.sumEUR.toFixed(2)})</span>
+				{/* <span>Sum: {store.sumPLN.toFixed(2)} PLN ({store.sumEUR.toFixed(2)})</span> */}
 			</div>
 
 		</div>

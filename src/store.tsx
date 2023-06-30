@@ -4,21 +4,19 @@ import { makeAutoObservable } from "mobx";
 interface Tran {
   id: number;
   tran: string;
-  tranValuePLN: number;
-  tranValueEUR: number;
+	amount: number;
 }
 
 const removeTran = (transactions: Tran[], id: number): Tran[] => {
   return transactions.filter((tran) => tran.id !== id);
 }
 
-const addNewTran = (transactions: Tran[], tran: string, tranValuePLN: number, tranValueEUR: number): Tran[] => [
+const addNewTran = (transactions: Tran[], tran: string, amount: number): Tran[] => [
   ...transactions,
   {
     id: Math.max(0, Math.max(...transactions.map(({ id }) => id))) + 1,
     tran,
-    tranValuePLN,
-    tranValueEUR
+		amount,
   },
 ];
 
@@ -27,10 +25,7 @@ class Transactions {
   transactions: Tran[] = [];
   tranName: string = "";
   euro: number = 0;
-  tranValuePLN: number = 0;
-  tranValueEUR: number = 0;
-	sumPLN: number = 0;
-	sumEUR: number = 0;
+  amount: number = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -38,22 +33,23 @@ class Transactions {
 
   removeTran(id: number) {
     this.transactions = removeTran(this.transactions, id);
-		this.calculateSum();
+		this.total();
   }
 
   addNewTran() {
-    this.tranValueEUR = Number((this.tranValuePLN / this.euro).toFixed(2));
-    this.transactions = addNewTran(this.transactions, this.tranName, this.tranValuePLN, this.tranValueEUR);
+    this.transactions = addNewTran(this.transactions, this.tranName, this.amount);
     this.tranName = "";
-    this.tranValuePLN = 0;
-    this.tranValueEUR = 0;
+    this.amount = 0;
 
-		this.calculateSum();
+		this.total();
   }
 
-	calculateSum() {
-		this.sumPLN = this.sum(this.transactions.map(value => value.tranValuePLN))
-		this.sumEUR = this.sum(this.transactions.map(value => value.tranValueEUR))
+	convertToEuro(n: number) {
+		return Number((n / this.euro).toFixed(2));
+	}
+
+	total() {
+		return this.sum(this.transactions.map(value => value.amount))
 	}
 
 	sum (arr: Array<number>) {
