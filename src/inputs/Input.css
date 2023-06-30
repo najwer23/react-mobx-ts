@@ -40,3 +40,8 @@
 		margin: 2px;
 		color: grey;
 	}
+
+	.input-with-label input.input-euro {
+		width: 100px;
+		margin: 10px;
+	}

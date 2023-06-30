@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 function List(): JSX.Element {
 	const inputTitleTran = useRef<HTMLInputElement>(null)
 	const inputAmount = useRef<HTMLInputElement>(null)
+	const inputEuro = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
 		store.loadCurrency();
@@ -40,11 +41,28 @@ function List(): JSX.Element {
 		return Validation("max2Decimals", inputAmount.current!.parentNode, inputAmount.current!.value);
 	}
 
+	function handleChangeEuro(e: React.FormEvent<HTMLInputElement>) : void {
+		store.setEuro(inputEuro.current!.value);
+	}
+
 	return (
 		<div style={{maxWidth: "600px"}}>
 			<div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
 				<div><h1>List Of Expense</h1></div>
-				<div><p>1 EUR = {store.euro} PLN</p></div>
+				<div style={{display: "flex", alignItems: "center"}}>
+
+					<span>1 EUR =</span>
+					<Input
+						innerRef={inputEuro}
+						id={"euro"}
+						type="text"
+						value={store.euroInputTxt}
+						className={"input-euro"}
+						onChange={handleChangeEuro}
+					/>
+					<span>PLN</span>
+
+				</div>
 			</div>
 
 
@@ -97,7 +115,7 @@ function List(): JSX.Element {
 						<tr key={item.id}>
 							<td>{item.tran}</td>
 							<td>{item.amount.toFixed(2)}</td>
-							<td>{store.convertToEuro(Number(item.amount.toFixed(2)))}</td>
+							<td>{store.convertToEuro(item.amount.toFixed(2)).toFixed(2)}</td>
 							<td>
 								<Button
 									onClick={() => { store.removeTran(item.id) }}
@@ -118,7 +136,9 @@ function List(): JSX.Element {
 			</div>
 
 			<div>
-				{/* <span>Sum: {store.sumPLN.toFixed(2)} PLN ({store.sumEUR.toFixed(2)})</span> */}
+				<span>
+						Sum: {store.total().toFixed(2)} PLN
+					( {store.convertToEuro(store.total().toFixed(2)).toFixed(2)} EUR)</span>
 			</div>
 
 		</div>

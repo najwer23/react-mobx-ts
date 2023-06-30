@@ -24,12 +24,21 @@ const addNewTran = (transactions: Tran[], tran: string, amount: number): Tran[] 
 class Transactions {
   transactions: Tran[] = [];
   tranName: string = "";
-  euro: number = 0;
-  amount: number = 0;
+	euro: number = 4.38;
+	euroInputTxt: string = "";
+	amount: number = 0;
 
   constructor() {
     makeAutoObservable(this);
   }
+
+	setEuro = (euro: string) => {
+		if (/^\d+(\.\d{1,10})?$/.test(euro)) {
+			if (Number(euro) > 0)
+				this.euro = Number(euro);
+		}
+		this.euroInputTxt = euro;
+	}
 
   removeTran(id: number) {
     this.transactions = removeTran(this.transactions, id);
@@ -44,11 +53,11 @@ class Transactions {
 		this.total();
   }
 
-	convertToEuro(n: number) {
-		return Number((n / this.euro).toFixed(2));
+	convertToEuro(n: string) {
+		return Number(Number(n) / this.euro);
 	}
 
-	total() {
+	total(): number {
 		return this.sum(this.transactions.map(value => value.amount))
 	}
 
@@ -60,9 +69,9 @@ class Transactions {
 		try {
 			let response = await fetch("https://api.nbp.pl/api/exchangerates/rates/a/eur/?format=json");
 			let json = await response.json();
-			this.euro = json.rates[0].mid;
+			this.setEuro(json.rates[0].mid);
 		} catch(e) {
-			this.euro = 4.382;
+			this.setEuro("4.382");
 		}
 
   }
