@@ -115,7 +115,7 @@ function List(): JSX.Element {
 						<tr key={item.id}>
 							<td>{item.tran}</td>
 							<td>{item.amount.toFixed(2)}</td>
-							<td>{store.convertToEuro(item.amount.toFixed(2)).toFixed(2)}</td>
+							<td>{store.convertToEuro(item.amount).toFixed(2)}</td>
 							<td>
 								<Button
 									onClick={() => { store.removeTran(item.id) }}
@@ -138,7 +138,7 @@ function List(): JSX.Element {
 			<div>
 				<span>
 						Sum: {store.total().toFixed(2)} PLN
-					( {store.convertToEuro(store.total().toFixed(2)).toFixed(2)} EUR)</span>
+					( {store.totalEuro().toFixed(2)} EUR)</span>
 			</div>
 
 		</div>

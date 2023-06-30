@@ -53,12 +53,16 @@ class Transactions {
 		this.total();
   }
 
-	convertToEuro(n: string) {
-		return Number(Number(n) / this.euro);
+	convertToEuro(n: number) {
+		return n / this.euro;
 	}
 
 	total(): number {
 		return this.sum(this.transactions.map(value => value.amount))
+	}
+
+	totalEuro(): number {
+		return this.sum(this.transactions.map(value => Number((this.convertToEuro(value.amount)).toFixed(2))));
 	}
 
 	sum (arr: Array<number>) {
